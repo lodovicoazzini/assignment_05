@@ -19,9 +19,9 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      * @return the number of key-value mappings in this map
      */
     @Pure
-    @Ensures("size_is_positive")
+    @Ensures("returns_non_negative")
     int size();
-    default boolean size_is_positive(int returns) {
+    default boolean returns_non_negative(int returns) {
         return returns >= 0;
     }
 
@@ -30,7 +30,12 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *
      * @return {@code true} if this map contains no key-value mappings
      */
+    @Pure
+    @Ensures("returns_iff_size_is_zero")
     boolean isEmpty();
+    default boolean returns_iff_size_is_zero(boolean returns) {
+        return returns == (size() == 0);
+    }
 
     /**
      * Returns {@code true} if this map contains a mapping for the specified
