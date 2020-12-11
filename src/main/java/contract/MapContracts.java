@@ -6,7 +6,11 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.BooleanSupplier;
 import java.util.function.Function;
+
+import static ch.usi.si.codelounge.jsicko.ContractUtils.exists;
+import static ch.usi.si.codelounge.jsicko.ContractUtils.implies;
 
 public interface MapContracts<K, V> extends Map<K, V>, Contract {
     // Query Operations
@@ -21,6 +25,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
     @Pure
     @Ensures("returns_non_negative")
     int size();
+
     default boolean returns_non_negative(int returns) {
         return returns >= 0;
     }
@@ -33,6 +38,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
     @Pure
     @Ensures("returns_iff_size_is_zero")
     boolean isEmpty();
+
     default boolean returns_iff_size_is_zero(boolean returns) {
         return returns == (size() == 0);
     }
@@ -54,7 +60,13 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *         does not permit null keys
      * (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      */
+    @Pure
+    @Ensures({"returns_iff_exists", "when_exception_null"})
     boolean containsKey(Object key);
+
+    default boolean returns_iff_exists(Object key, boolean returns) {
+        // return implies(returns, () -> exists())
+    }
 
     /**
      * Returns {@code true} if this map maps one or more keys to the
