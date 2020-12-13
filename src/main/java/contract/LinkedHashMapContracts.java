@@ -11,6 +11,11 @@ import java.util.function.Function;
 public class LinkedHashMapContracts<K, V> extends LinkedHashMap<K, V> implements MapContracts<K, V> {
 
     @Override
+    public boolean supports_null_keys() {
+        return true;
+    }
+
+    @Override
     public boolean containsValue(Object value) {
         return super.containsValue(value);
     }

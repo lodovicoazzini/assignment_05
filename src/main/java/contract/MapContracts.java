@@ -15,11 +15,11 @@ import static ch.usi.si.codelounge.jsicko.ContractUtils.implies;
 public interface MapContracts<K, V> extends Map<K, V>, Contract {
 
     /**
-     * Method to know if the map supports null elements
-     * @return true iff the map supports null elements
+     * Method to know if the map supports null keys
+     * @return true iff the map supports null keys
      */
     @Pure
-    boolean supports_null_elements();
+    boolean supports_null_keys();
 
     // Invariants
     @Invariant
@@ -75,10 +75,17 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      * (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      */
     @Pure
-    @Ensures({"returns_iff_exists", "when_exception_null"})
+    @Ensures({"returns_iff_exists", "exception_if_wrong_key_type", "throws_if_null_unsupported_and_null"})
     boolean containsKey(Object key);
     default boolean returns_iff_exists(Object key, boolean returns) {
         // return implies(returns, () -> exists())
+        return false; // TODO: placeholder
+    }
+    default boolean exception_if_wrong_key_type(Throwable raises, Object key) {
+        return implies(
+                !isEmpty() && // if the map is not empty
+                        key != keySet().stream().findAny().getClass(), // and the parameter is not of the same type of the keys
+                () -> raises instanceof ClassCastException); // throws a ClassCastException
     }
 
     /**

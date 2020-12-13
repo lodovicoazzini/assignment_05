@@ -11,6 +11,11 @@ import java.util.function.Function;
 public class HashMapContracts<K, V> extends HashMap<K, V> implements MapContracts<K, V> {
 
     @Override
+    public boolean supports_null_keys() {
+        return true;
+    }
+
+    @Override
     public int size() {
         return super.size();
     }
