@@ -14,6 +14,13 @@ import static ch.usi.si.codelounge.jsicko.ContractUtils.implies;
 
 public interface MapContracts<K, V> extends Map<K, V>, Contract {
 
+    /**
+     * Method to know if the map supports null elements
+     * @return true iff the map supports null elements
+     */
+    @Pure
+    boolean supports_null_elements();
+
     // Invariants
     @Invariant
     @Pure
