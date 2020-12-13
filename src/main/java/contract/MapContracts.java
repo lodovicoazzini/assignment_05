@@ -28,6 +28,11 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
         return size() >= 0;
     }
 
+    // TODO: Invariant
+    //  The a key can't be mapped to more than one value
+    //      key(k) has value (v) --> key(k) has no other value
+    //      key(k) has at most one value
+
     // Query Operations
 
     /**
@@ -48,7 +53,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
     @Pure
     @Ensures("returns_iff_size_is_zero")
     boolean isEmpty();
-
     default boolean returns_iff_size_is_zero(boolean returns) {
         return returns == (size() == 0);
     }
@@ -73,7 +77,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
     @Pure
     @Ensures({"returns_iff_exists", "when_exception_null"})
     boolean containsKey(Object key);
-
     default boolean returns_iff_exists(Object key, boolean returns) {
         // return implies(returns, () -> exists())
     }
