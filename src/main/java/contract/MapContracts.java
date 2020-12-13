@@ -59,6 +59,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
     @Pure
     @Ensures("returns_iff_size_is_zero")
     boolean isEmpty();
+    @Pure
     default boolean returns_iff_size_is_zero(boolean returns) {
         return returns == (size() == 0);
     }
@@ -83,9 +84,11 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
     @Pure
     @Ensures({"returns_iff_key_exists", "raises_if_wrong_key_type", "raises_if_null_unsupported_and_null_item"})
     boolean containsKey(Object key);
+    @Pure
     default boolean returns_iff_key_exists(boolean returns, Object key) { // TODO: is this necessary? Maybe we're just repeating the implementation
         return returns == (keySet().stream().anyMatch(thisKey -> thisKey == key));
     }
+    @Pure
     default boolean raises_if_wrong_key_type(Throwable raises, Object key) { // TODO: Check if it's possible to get a collection type at runtime, problems if the map is empty
         return implies(!isEmpty() && // if the map is not empty
                         key.getClass() != keySet().stream().findAny().getClass(), // and the parameter is not of the same type of the keys
@@ -113,9 +116,11 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
     @Pure
     @Ensures({"returns_iff_value_exists", "raises_if_wrong_value_type", "raises_if_null_unsupported_and_null_item"})
     boolean containsValue(Object value);
+    @Pure
     default boolean returns_iff_value_exists(boolean returns, Object value) {
         return returns == (values().stream().anyMatch(thisValue -> thisValue == value));
     }
+    @Pure
     default boolean raises_if_wrong_value_type(Throwable raises, Object value) {
         return implies(!isEmpty() &&
                         value.getClass() != values().stream().findAny().getClass(),
@@ -148,6 +153,8 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *         does not permit null keys
      * (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      */
+    @Pure
+    @Ensures({"returns_iff_key_exists", "raises_if_wrong_key_type", "raises_if_null_unsupported_and_null_item"})
     V get(Object key);
 
     // Modification Operations
