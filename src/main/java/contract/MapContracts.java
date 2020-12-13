@@ -185,11 +185,18 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *         or value prevents it from being stored in this map
      */
     @Requires({"raises_if_wrong_key_type", "raises_if_wrong_value_type"})
-    @Ensures({"contains_entry_key_value",
+    @Ensures({"null_if_not_key_else_value",
+            "contains_entry_key_value",
             "size_increases_iff_value_not_contained",
             "raises_if_unsupported_put_operation",
             "raises_if_null_unsupported_and_null_item"})
     V put(K key, V value);
+    @Pure
+    default boolean null_if_not_key_else_old_value(V returns, K key) {
+        return implies(!old(this).containsKey(key),
+                () -> returns == null,
+                () -> returns == old(this).get(key));
+    }
     @Pure
     default boolean contains_entry_key_value(K key, V value) {
         return (containsKey(key) && get(key) == value);
