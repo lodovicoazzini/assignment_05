@@ -203,13 +203,13 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
     }
     @Pure
     default boolean size_increases_iff_value_not_contained(V returns, K key, V value) {
-        return ContractUtils.implies(!old(this).containsKey(key),
+        return implies(!old(this).containsKey(key),
                 () -> this.size() == old(this).size() + 1,
                 () -> this.size() == old(this).size());
     }
     @Pure
     default boolean raises_if_unsupported_put_operation(Throwable raises) {
-        return ContractUtils.implies(!support_put_operation(), () -> raises instanceof UnsupportedOperationException);
+        return implies(!support_put_operation(), () -> raises instanceof UnsupportedOperationException);
     }
 
 
@@ -256,13 +256,13 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
     }
     @Pure
     default boolean size_decreased_iff_value_contained(Object key) {
-        return ContractUtils.implies(old(this).containsKey(key),
+        return implies(old(this).containsKey(key),
                 () -> this.size() == old(this).size() - 1,
                 () -> this.size() == old(this).size());
     }
     @Pure
     default boolean raises_if_unsupported_remove_operation(Throwable raises) {
-        return ContractUtils.implies(!support_remove_operation(), () -> raises instanceof UnsupportedOperationException);
+        return implies(!support_remove_operation(), () -> raises instanceof UnsupportedOperationException);
     }
 
 
@@ -824,7 +824,8 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      * @since 1.8
      */
     @Ensures({"null_if_not_key_else_value",
-            "size_increases_iff_value_not_contained", "value_changed_only_if_not_key"})
+            "size_increases_iff_value_not_contained",
+            "value_changed_only_if_not_key"})
     default V putIfAbsent(K key, V value) {
         V v = get(key);
         if (v == null) {
@@ -874,6 +875,9 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *         (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      * @since 1.8
      */
+    @Ensures({"size_decreased_iff_key_value",
+            "value_unchanged_if_not_key_value",
+            "returns_iff_key_value_deleted"})
     default boolean remove(Object key, Object value) {
         Object curValue = get(key);
         if (!Objects.equals(curValue, value) ||
@@ -882,6 +886,20 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
         }
         remove(key);
         return true;
+    }
+    @Pure
+    default boolean size_decreased_iff_key_value(Object key, Object value) {
+        return implies(old(this).get(key) == value,
+                () -> size() == old(this).size() - 1,
+                () -> size() == old(this).size());
+    }
+    @Pure
+    default boolean value_unchanged_if_not_key_value(Object key, Object value) {
+        return implies(old(this).get(key) != value, () -> get(key) == old(this).get(key));
+    }
+    @Pure
+    default boolean returns_iff_key_value_deleted(boolean returns, Object key, Object value) {
+        return returns == (old(this).get(key) == value && !containsKey(key));
     }
 
     /**
