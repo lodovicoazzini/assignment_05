@@ -823,6 +823,8 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *         (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      * @since 1.8
      */
+    @Ensures({"null_if_not_key_else_value",
+            "size_increases_iff_value_not_contained", "value_changed_only_if_not_key"})
     default V putIfAbsent(K key, V value) {
         V v = get(key);
         if (v == null) {
@@ -830,6 +832,12 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
         }
 
         return v;
+    }
+    @Pure
+    default boolean value_changed_only_if_not_key(K key, V value) {
+        return implies(old(this).containsKey(key),
+                () -> get(key) == old(this).get(key),
+                () -> get(key) == value);
     }
 
     /**
