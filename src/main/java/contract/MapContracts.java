@@ -15,13 +15,6 @@ import static ch.usi.si.codelounge.jsicko.ContractUtils.implies;
 
 public interface MapContracts<K, V> extends Map<K, V>, Contract {
 
-    /**
-     * Method to know if the map supports null keys
-     * @return true iff the map supports null keys
-     */
-    @Pure
-    boolean supports_null_keys();
-
     // Invariants
     @Invariant
     @Pure
@@ -34,6 +27,17 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
     //      key(k) has value (v) --> key(k) has no other value
     //      key(k) has at most one value
 
+    /**
+     * Method to know if the map supports null keys
+     * @return true iff the map supports null keys
+     */
+    @Pure
+    boolean supports_null_keys();
+
+    default boolean raises_if_null_unsupported_and_null_item(Throwable raises, Object item) {
+        return implies(!supports_null_keys() && item == null,
+                () -> raises instanceof NullPointerException);
+    }
 
     // Query Operations
 
@@ -77,19 +81,15 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      * (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      */
     @Pure
-    @Ensures({"returns_iff_exists", "raises_if_wrong_key_type", "raises_if_null_unsupported_and_null"})
+    @Ensures({"returns_iff_key_exists", "raises_if_wrong_key_type", "raises_if_null_unsupported_and_null_item"})
     boolean containsKey(Object key);
-    default boolean returns_iff_exists(boolean returns, Object key) { // TODO: is this necessary? Maybe we're just repeating the implementation
+    default boolean returns_iff_key_exists(boolean returns, Object key) { // TODO: is this necessary? Maybe we're just repeating the implementation
         return returns == (keySet().stream().anyMatch(thisKey -> thisKey == key));
     }
-    default boolean raises_if_wrong_key_type(Throwable raises, Object key) {
+    default boolean raises_if_wrong_key_type(Throwable raises, Object key) { // TODO: Check if it's possible to get a collection type at runtime, problems if the map is empty
         return implies(!isEmpty() && // if the map is not empty
-                        key != keySet().stream().findAny().getClass(), // and the parameter is not of the same type of the keys
+                        key.getClass() != keySet().stream().findAny().getClass(), // and the parameter is not of the same type of the keys
                 () -> raises instanceof ClassCastException); // throws a ClassCastException
-    }
-    default boolean raises_if_null_unsupported_and_null(Throwable raises, Object key) {
-        return implies(!supports_null_keys() && key == null,
-                () -> raises instanceof NullPointerException);
     }
 
     /**
@@ -110,7 +110,17 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *         map does not permit null values
      * (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      */
+    @Pure
+    @Ensures({"returns_iff_value_exists", "raises_if_wrong_value_type", "raises_if_null_unsupported_and_null_item"})
     boolean containsValue(Object value);
+    default boolean returns_iff_value_exists(boolean returns, Object value) {
+        return returns == (values().stream().anyMatch(thisValue -> thisValue == value));
+    }
+    default boolean raises_if_wrong_value_type(Throwable raises, Object value) {
+        return implies(!isEmpty() &&
+                        value.getClass() != values().stream().findAny().getClass(),
+                () -> raises instanceof ClassCastException);
+    }
 
     /**
      * Returns the value to which the specified key is mapped,
