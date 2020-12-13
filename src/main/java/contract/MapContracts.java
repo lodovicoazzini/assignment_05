@@ -79,9 +79,8 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
     @Pure
     @Ensures({"returns_iff_exists", "raises_if_wrong_key_type", "raises_if_null_unsupported_and_null"})
     boolean containsKey(Object key);
-    default boolean returns_iff_exists(Object key, boolean returns) {
-        // return implies(returns, () -> exists())
-        return false; // TODO: placeholder
+    default boolean returns_iff_exists(boolean returns, Object key) { // TODO: is this necessary? Maybe we're just repeating the implementation
+        return returns == (keySet().stream().anyMatch(thisKey -> thisKey == key));
     }
     default boolean raises_if_wrong_key_type(Throwable raises, Object key) {
         return implies(!isEmpty() && // if the map is not empty
