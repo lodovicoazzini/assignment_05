@@ -2,25 +2,22 @@ package contract;
 
 import ch.usi.si.codelounge.jsicko.Contract;
 import ch.usi.si.codelounge.jsicko.ContractUtils;
-import org.checkerframework.dataflow.qual.Pure;
 
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.function.BooleanSupplier;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static ch.usi.si.codelounge.jsicko.ContractUtils.*;
 
 import static ch.usi.si.codelounge.jsicko.Contract.old;
+import static ch.usi.si.codelounge.jsicko.ContractUtils.iff;
+import static ch.usi.si.codelounge.jsicko.ContractUtils.implies;
 
 
 public interface MapContracts<K, V> extends Map<K, V>, Contract {
 
     // Invariants
-    @Contract.Invariant
+    @Invariant
     @Pure
     default boolean size_non_negative() {
         return size() >= 0;
@@ -158,7 +155,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
     V get(Object key);
     @Pure
     default boolean returns_value_iff_key(V returns, Object key) {
-        return iff(containsKey(key), returns != null);
+        return iff(containsKey(key), returns == get(key));
     }
 
     // Modification Operations
@@ -646,11 +643,21 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      * (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      * @since 1.8
      */
+    @Ensures({"returns_value_if_key", "returns_default_if_not_key",
+            "raises_if_null_unsupported_and_null_item", "raises_if_wrong_key_type"})
     default V getOrDefault(Object key, V defaultValue) {
         V v;
         return (((v = get(key)) != null) || containsKey(key))
                 ? v
                 : defaultValue;
+    }
+    @Pure
+    default boolean returns_value_if_key(V returns, Object key) {
+        return implies(containsKey(key), () -> returns == get(key));
+    }
+    @Pure
+    default boolean returns_default_if_not_key(V returns, Object key, V defaultValue) {
+        return implies(!containsKey(key), () -> returns == defaultValue);
     }
 
     /**
@@ -733,6 +740,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      * removed during iteration
      * @since 1.8
      */
+    @Ensures({"size_not_changed", "key_set_not_changed", "values_changed_with_function"})
     default void replaceAll(BiFunction<? super K, ? super V, ? extends V> function) {
         Objects.requireNonNull(function);
         for (Map.Entry<K, V> entry : entrySet()) {
@@ -756,6 +764,14 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
                 throw new ConcurrentModificationException(ise);
             }
         }
+    }
+    @Pure
+    default boolean key_set_not_changed() {
+        return old(this).keySet().stream().allMatch(this::containsKey);
+    }
+    @Pure
+    default boolean values_changed_with_function(BiFunction<? super K, ? super V, ? extends V> function) {
+        return keySet().stream().allMatch(key -> get(key) == function.apply(key, old(this)get(key)));
     }
 
     /**
