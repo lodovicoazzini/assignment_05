@@ -13,6 +13,14 @@ import static ch.usi.si.codelounge.jsicko.ContractUtils.exists;
 import static ch.usi.si.codelounge.jsicko.ContractUtils.implies;
 
 public interface MapContracts<K, V> extends Map<K, V>, Contract {
+
+    // Invariants
+    @Invariant
+    @Pure
+    default boolean size_non_negative() {
+        return size() >= 0;
+    }
+
     // Query Operations
 
     /**
@@ -23,12 +31,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      * @return the number of key-value mappings in this map
      */
     @Pure
-    @Ensures("returns_non_negative")
     int size();
-
-    default boolean returns_non_negative(int returns) {
-        return returns >= 0;
-    }
 
     /**
      * Returns {@code true} if this map contains no key-value mappings.
