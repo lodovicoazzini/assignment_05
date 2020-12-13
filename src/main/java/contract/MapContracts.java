@@ -8,6 +8,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static ch.usi.si.codelounge.jsicko.ContractUtils.exists;
 import static ch.usi.si.codelounge.jsicko.ContractUtils.implies;
@@ -29,9 +30,10 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
     }
 
     // TODO: Invariant
-    //  The a key can't be mapped to more than one value
+    //  The a key can't be mapped to more than one value (maybe impossible because key value stored as set
     //      key(k) has value (v) --> key(k) has no other value
     //      key(k) has at most one value
+
 
     // Query Operations
 
@@ -75,17 +77,20 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      * (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      */
     @Pure
-    @Ensures({"returns_iff_exists", "exception_if_wrong_key_type", "throws_if_null_unsupported_and_null"})
+    @Ensures({"returns_iff_exists", "raises_if_wrong_key_type", "raises_if_null_unsupported_and_null"})
     boolean containsKey(Object key);
     default boolean returns_iff_exists(Object key, boolean returns) {
         // return implies(returns, () -> exists())
         return false; // TODO: placeholder
     }
-    default boolean exception_if_wrong_key_type(Throwable raises, Object key) {
-        return implies(
-                !isEmpty() && // if the map is not empty
+    default boolean raises_if_wrong_key_type(Throwable raises, Object key) {
+        return implies(!isEmpty() && // if the map is not empty
                         key != keySet().stream().findAny().getClass(), // and the parameter is not of the same type of the keys
                 () -> raises instanceof ClassCastException); // throws a ClassCastException
+    }
+    default boolean raises_if_null_unsupported_and_null(Throwable raises, Object key) {
+        return implies(!supports_null_keys() && key == null,
+                () -> raises instanceof NullPointerException);
     }
 
     /**
