@@ -272,7 +272,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *
      * @return the number of key-value mappings in this map
      */
-//    @Pure
+    @Pure
     int size();
 
     /**
@@ -280,7 +280,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *
      * @return {@code true} if this map contains no key-value mappings
      */
-//    @Pure
+    @Pure
 //    @Ensures("returns_iff_size_is_zero")
     boolean isEmpty();
 
@@ -301,7 +301,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *         does not permit null keys
      * (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      */
-//    @Pure
+    @Pure
 //    @Ensures({
 //            "returns_iff_key_exists",
 //            "raises_if_null_unsupported_and_null_key"
@@ -326,7 +326,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *         map does not permit null values
      * (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      */
-//    @Pure
+    @Pure
 //    @Ensures({
 //            "returns_iff_value_exists",
 //            "raises_if_null_unsupported_and_null_value"
@@ -359,7 +359,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *         does not permit null keys
      * (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      */
-//    @Pure
+    @Pure
 //    @Ensures({
 //            "value_if_contains_key_else_null",
 //            "raises_if_null_unsupported_and_null_key"
@@ -497,6 +497,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *
      * @return a set view of the keys contained in this map
      */
+    @Pure
 //    @Ensures({"returns_all_keys"})
     Set<K> keySet();
 
@@ -515,6 +516,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *
      * @return a collection view of the values contained in this map
      */
+    @Pure
 //    @Ensures("returns_all_values")
     Collection<V> values();
 
@@ -534,6 +536,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *
      * @return a set view of the mappings contained in this map
      */
+    @Pure
 //    @Ensures({"returns_all_entries"})
     Set<Map.Entry<K, V>> entrySet();
 
@@ -618,7 +621,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
          *         required to, throw this exception if the entry has been
          *         removed from the backing map.
          */
-//        @Pure
+        @Pure
         K getKey();
 
         /**
@@ -631,7 +634,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
          *         required to, throw this exception if the entry has been
          *         removed from the backing map.
          */
-//        @Pure
+        @Pure
         V getValue();
 
         /**
@@ -675,7 +678,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
          * @return {@code true} if the specified object is equal to this map
          *         entry
          */
-//        @Pure
+        @Pure
 //        @Ensures({
 //                "returns_pairwise_equals",
 //                "returns_same_hashcode"
@@ -698,7 +701,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
          * @see Object#equals(Object)
          * @see #equals(Object)
          */
-//        @Pure
+        @Pure
         int hashCode();
 
         /**
@@ -713,6 +716,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
          * @see Comparable
          * @since 1.8
          */
+        @Pure
         public static <K extends Comparable<? super K>, V> Comparator<Map.Entry<K, V>> comparingByKey() {
             return (Comparator<Map.Entry<K, V>> & Serializable)
                     (c1, c2) -> c1.getKey().compareTo(c2.getKey());
@@ -730,6 +734,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
          * @see Comparable
          * @since 1.8
          */
+        @Pure
         public static <K, V extends Comparable<? super V>> Comparator<Map.Entry<K, V>> comparingByValue() {
             return (Comparator<Map.Entry<K, V>> & Serializable)
                     (c1, c2) -> c1.getValue().compareTo(c2.getValue());
@@ -748,6 +753,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
          * @return a comparator that compares {@link Map.Entry} by the key.
          * @since 1.8
          */
+        @Pure
         public static <K, V> Comparator<Map.Entry<K, V>> comparingByKey(Comparator<? super K> cmp) {
             Objects.requireNonNull(cmp);
             return (Comparator<Map.Entry<K, V>> & Serializable)
@@ -767,6 +773,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
          * @return a comparator that compares {@link Map.Entry} by the value.
          * @since 1.8
          */
+        @Pure
         public static <K, V> Comparator<Map.Entry<K, V>> comparingByValue(Comparator<? super V> cmp) {
             Objects.requireNonNull(cmp);
             return (Comparator<Map.Entry<K, V>> & Serializable)
@@ -788,7 +795,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      * @param o object to be compared for equality with this map
      * @return {@code true} if the specified object is equal to this map
      */
-//    @Pure
+    @Pure
 //    @Ensures({
 //            "returns_pairwise_equals",
 //            "returns_same_hashcode"
@@ -808,7 +815,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      * @see Object#equals(Object)
      * @see #equals(Object)
      */
-//    @Pure
+    @Pure
     int hashCode();
 
     // Defaultable methods
@@ -835,7 +842,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      * (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      * @since 1.8
      */
-//    @Pure
+    @Pure
 //    @Ensures({
 //            "value_if_contains_key_else_default",
 //            "raises_if_null_unsupported_and_null_key"
