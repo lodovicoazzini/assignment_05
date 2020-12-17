@@ -1,4 +1,4 @@
-package contract;
+package contracts;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,15 +16,11 @@ public class HashMapContracts<K, V> extends HashMap<K, V> implements MapContract
     // ==============================                              ==============================
     // ==========================================================================================
 
-    @Override
-    public boolean supports_null_items() {
-        return true;
-    }
+
 
     // ==========================================================================================
     // ==========================================================================================
     // ==========================================================================================
-
 
     @Override
     public int size() {
@@ -81,10 +77,10 @@ public class HashMapContracts<K, V> extends HashMap<K, V> implements MapContract
         return super.values();
     }
 
-    @Override
-    public Set<Map.Entry<K, V>> entrySet() {
-        return super.entrySet();
-    }
+//    @Override
+//    public Set<Map.Entry<K, V>> entrySet() {
+//        return super.entrySet();
+//    }
 
     @Override
     public V getOrDefault(Object key, V defaultValue) {

@@ -1,8 +1,11 @@
-package contract;
+package contracts;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.*;
 
@@ -14,10 +17,6 @@ public class ConcurrentHashMapContracts<K, V> extends ConcurrentHashMap<K, V> im
     // ==============================                              ==============================
     // ==========================================================================================
 
-    @Override
-    public boolean supports_null_items() {
-        return false;
-    }
 
 
     // ==========================================================================================
@@ -26,11 +25,7 @@ public class ConcurrentHashMapContracts<K, V> extends ConcurrentHashMap<K, V> im
     // ==============================                              ==============================
     // ==========================================================================================
 
-    @Invariant
-    @Pure
-    public boolean none_null() {
-        return entrySet().stream().allMatch(entry -> entry.getKey() != null && entry.getValue() != null);
-    }
+
 
     // ==========================================================================================
     // ==========================================================================================
@@ -91,10 +86,10 @@ public class ConcurrentHashMapContracts<K, V> extends ConcurrentHashMap<K, V> im
         return super.values();
     }
 
-    @Override
-    public Set<Map.Entry<K, V>> entrySet() {
-        return super.entrySet();
-    }
+//    @Override
+//    public Set<Map.Entry<K, V>> entrySet() {
+//        return super.entrySet();
+//    }
 
     @Override
     public int hashCode() {
@@ -181,10 +176,10 @@ public class ConcurrentHashMapContracts<K, V> extends ConcurrentHashMap<K, V> im
         return super.elements();
     }
 
-    @Override
-    public long mappingCount() {
-        return super.mappingCount();
-    }
+//    @Override
+//    public long mappingCount() {
+//        return super.mappingCount();
+//    }
 
     @Override
     public KeySetView<K, V> keySet(V mappedValue) {
@@ -216,10 +211,10 @@ public class ConcurrentHashMapContracts<K, V> extends ConcurrentHashMap<K, V> im
         return super.reduceToDouble(parallelismThreshold, transformer, basis, reducer);
     }
 
-    @Override
-    public long reduceToLong(long parallelismThreshold, ToLongBiFunction<? super K, ? super V> transformer, long basis, LongBinaryOperator reducer) {
-        return super.reduceToLong(parallelismThreshold, transformer, basis, reducer);
-    }
+//    @Override
+//    public long reduceToLong(long parallelismThreshold, ToLongBiFunction<? super K, ? super V> transformer, long basis, LongBinaryOperator reducer) {
+//        return super.reduceToLong(parallelismThreshold, transformer, basis, reducer);
+//    }
 
     @Override
     public int reduceToInt(long parallelismThreshold, ToIntBiFunction<? super K, ? super V> transformer, int basis, IntBinaryOperator reducer) {
@@ -256,10 +251,10 @@ public class ConcurrentHashMapContracts<K, V> extends ConcurrentHashMap<K, V> im
         return super.reduceKeysToDouble(parallelismThreshold, transformer, basis, reducer);
     }
 
-    @Override
-    public long reduceKeysToLong(long parallelismThreshold, ToLongFunction<? super K> transformer, long basis, LongBinaryOperator reducer) {
-        return super.reduceKeysToLong(parallelismThreshold, transformer, basis, reducer);
-    }
+//    @Override
+//    public long reduceKeysToLong(long parallelismThreshold, ToLongFunction<? super K> transformer, long basis, LongBinaryOperator reducer) {
+//        return super.reduceKeysToLong(parallelismThreshold, transformer, basis, reducer);
+//    }
 
     @Override
     public int reduceKeysToInt(long parallelismThreshold, ToIntFunction<? super K> transformer, int basis, IntBinaryOperator reducer) {
@@ -296,10 +291,10 @@ public class ConcurrentHashMapContracts<K, V> extends ConcurrentHashMap<K, V> im
         return super.reduceValuesToDouble(parallelismThreshold, transformer, basis, reducer);
     }
 
-    @Override
-    public long reduceValuesToLong(long parallelismThreshold, ToLongFunction<? super V> transformer, long basis, LongBinaryOperator reducer) {
-        return super.reduceValuesToLong(parallelismThreshold, transformer, basis, reducer);
-    }
+//    @Override
+//    public long reduceValuesToLong(long parallelismThreshold, ToLongFunction<? super V> transformer, long basis, LongBinaryOperator reducer) {
+//        return super.reduceValuesToLong(parallelismThreshold, transformer, basis, reducer);
+//    }
 
     @Override
     public int reduceValuesToInt(long parallelismThreshold, ToIntFunction<? super V> transformer, int basis, IntBinaryOperator reducer) {
@@ -336,10 +331,10 @@ public class ConcurrentHashMapContracts<K, V> extends ConcurrentHashMap<K, V> im
         return super.reduceEntriesToDouble(parallelismThreshold, transformer, basis, reducer);
     }
 
-    @Override
-    public long reduceEntriesToLong(long parallelismThreshold, ToLongFunction<Map.Entry<K, V>> transformer, long basis, LongBinaryOperator reducer) {
-        return super.reduceEntriesToLong(parallelismThreshold, transformer, basis, reducer);
-    }
+//    @Override
+//    public long reduceEntriesToLong(long parallelismThreshold, ToLongFunction<Map.Entry<K, V>> transformer, long basis, LongBinaryOperator reducer) {
+//        return super.reduceEntriesToLong(parallelismThreshold, transformer, basis, reducer);
+//    }
 
     @Override
     public int reduceEntriesToInt(long parallelismThreshold, ToIntFunction<Map.Entry<K, V>> transformer, int basis, IntBinaryOperator reducer) {

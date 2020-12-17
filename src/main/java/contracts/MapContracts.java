@@ -1,4 +1,4 @@
-package contract;
+package contracts;
 
 import ch.usi.si.codelounge.jsicko.Contract;
 
@@ -7,9 +7,6 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
-import static ch.usi.si.codelounge.jsicko.Contract.old;
-import static ch.usi.si.codelounge.jsicko.ContractUtils.*;
 
 
 public interface MapContracts<K, V> extends Map<K, V>, Contract {
@@ -21,8 +18,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
     // ==============================                              ==============================
     // ==========================================================================================
 
-    @Pure
-    boolean supports_null_items(); // whether the implementation supports null items
 
 
     // ==========================================================================================
@@ -31,18 +26,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
     // ==============================                              ==============================
     // ==========================================================================================
 
-    @Invariant
-    @Pure
-    default boolean size_non_negative() {
-        return size() >= 0;
-    }
-
-    @Invariant
-    @Pure
-    default boolean hashcode_is_valid(int returns) {
-        return returns == entrySet().stream().map(Map.Entry::hashCode)
-                .reduce(0, Integer::sum);
-    }
 
 
     // ==========================================================================================
@@ -51,164 +34,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
     // ==============================                              ==============================
     // ==========================================================================================
 
-    @Pure
-    default boolean returns_iff_size_is_zero(boolean returns) {
-        return returns == (size() == 0);
-    }
-
-    @Pure
-    default boolean returns_iff_key_exists(boolean returns, Object other) {
-        return implies(returns, () -> exists(this.keySet(), key -> Objects.equals(other, key)));
-    }
-
-    @Pure
-    default boolean returns_iff_value_exists(boolean returns, Object other) {
-        return implies(returns, () -> exists(this.values(), value -> Objects.equals(other, value)));
-    }
-
-    @Pure
-    default boolean returns_same_hashcode(boolean returns, Object o) {
-        return iff(returns, this.hashCode() == o.hashCode());
-    }
-
-    @Pure
-    default boolean returns_iff_entry_deleted(boolean returns, Object key, Object value) {
-        return returns == (old(this).get(key) == value && !containsKey(key));
-    }
-
-    @Pure
-    default boolean pairwise_equals(boolean returns, Object o) {
-        if (o instanceof Map) {
-            Map<? , ?> genOther = (Map<?, ?>) o;
-
-            if (this.keySet().getClass().isAssignableFrom(genOther.keySet().getClass())
-                    && this.values().getClass().isAssignableFrom(genOther.values().getClass())) {
-                Map<K, V> other = (Map<K, V>) o;
-
-                if (size() == other.size()) {
-                    return returns == keySet().stream().allMatch(key -> other.get(key) == this.get(key));
-                }
-            }
-        }
-
-        return !returns;
-    }
-
-    @Pure
-    default boolean is_empty() {
-        return isEmpty();
-    }
-
-    default boolean not_contains_key(Object key) {
-        return !containsKey(key);
-    }
-
-    @Pure
-    default boolean contains_entry(K key, V value) {
-        return (get(key) == value);
-    }
-
-    @Pure
-    default boolean contains_all_entries(Map<? extends K, ? extends V> other) {
-        return other.entrySet().stream().allMatch(entry -> get(entry.getKey()) == entry.getValue());
-    }
-
-    @Pure
-    default boolean value_if_contains_key_else_null(V returns, Object key) {
-        return implies(containsKey(key),
-                () -> returns == get(key),
-                () -> returns == null);
-    }
-
-    @Pure
-    default boolean old_value_if_contained_key_else_null(V returns, K key) {
-        return implies(old(this).containsKey(key),
-                () -> returns == old(this).get(key),
-                () -> returns == null);
-    }
-
-    @Pure
-    default boolean value_if_contains_key_else_default(V returns, Object key, V defaultValue) {
-        return implies(containsKey(key),
-                () -> returns == get(key),
-                () -> returns == defaultValue);
-    }
-
-    @Pure
-    default boolean returns_all_keys(Set<K> returns) {
-        return returns.stream().allMatch(this::containsKey);
-    }
-
-    @Pure
-    default boolean returns_all_values(Collection<V> returns) {
-        return returns.stream().allMatch(value -> containsValue(value));
-    }
-
-    @Pure
-    default boolean returns_all_entries(Set<Map.Entry<K, V>> returns) {
-        return returns.stream().allMatch(entry -> get(entry.getKey()) == entry.getValue());
-    }
-
-    @Pure
-    default boolean size_increases_iff_key_not_contained(K key) {
-        return implies(!old(this).containsKey(key),
-                () -> this.size() == old(this).size() + 1,
-                () -> this.size() == old(this).size());
-    }
-
-    @Pure
-    default boolean size_increased_for_each_key_not_contained(Map<? extends K, ? extends V> other) {
-        return size() == old(this).size() + other.keySet().stream().filter(key -> !old(this).containsKey(key)).count();
-    }
-
-    @Pure
-    default boolean size_decreases_iff_key_contained(Object key) {
-        return implies(old(this).containsKey(key),
-                () -> this.size() == old(this).size() - 1,
-                () -> this.size() == old(this).size());
-    }
-
-    @Pure
-    default boolean size_decreased_iff_contained_entry(Object key, Object value) {
-        return implies(old(this).get(key) == value,
-                () -> size() == old(this).size() - 1,
-                () -> size() == old(this).size());
-    }
-
-    @Pure
-    default boolean size_not_changed() {
-        return size() == old(this).size();
-    }
-
-    @Pure
-    default boolean keys_not_changed() {
-        return old(this).keySet().stream().allMatch(this::containsKey);
-    }
-
-    @Pure
-    default boolean values_changed_with_function(BiFunction<? super K, ? super V, ? extends V> function) {
-        return keySet().stream().allMatch(key -> get(key) == function.apply(key, old(this).get(key)));
-    }
-
-    @Pure
-    default boolean value_changes_only_if_not_contained_key(K key, V value) {
-        return implies(old(this).containsKey(key),
-                () -> get(key) == old(this).get(key),
-                () -> get(key) == value);
-    }
-
-    @Pure
-    default boolean value_changes_only_if_contained_entry(K key, V oldValue, V newValue) {
-        return implies(old(this).get(key) == oldValue,
-                () -> get(key) == newValue,
-                () -> get(key) == old(this).get(key));
-    }
-
-    @Pure
-    default boolean value_unchanged_if_not_contained_entry(Object key, Object value) {
-        return implies(old(this).get(key) != value,
-                () -> get(key) == old(this).get(key));
-    }
 
 
     // ==========================================================================================
@@ -217,26 +42,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
     // ==============================                              ==============================
     // ==========================================================================================
 
-    @Pure
-    default boolean raises_if_null_unsupported_and_null_item(Throwable raises, Object item) {
-        return implies(!supports_null_items()
-                        && item == null,
-                () -> raises instanceof NullPointerException);
-    }
 
-    @Pure
-    default boolean raises_if_wrong_key_type(Throwable raises, Object key) {
-        return implies(!isEmpty()
-                        && key.getClass() != keySet().stream().findAny().getClass(),
-                () -> raises instanceof ClassCastException);
-    }
-
-    @Pure
-    default boolean raises_if_wrong_value_type(Throwable raises, Object value) {
-        return implies(!isEmpty()
-                        && value.getClass() != values().stream().findAny().getClass(),
-                () -> raises instanceof ClassCastException);
-    }
 
     // ==========================================================================================
     // ==========================================================================================
@@ -252,7 +58,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *
      * @return the number of key-value mappings in this map
      */
-    @Pure
     int size();
 
     /**
@@ -260,8 +65,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *
      * @return {@code true} if this map contains no key-value mappings
      */
-    @Pure
-    @Ensures("returns_iff_size_is_zero")
     boolean isEmpty();
 
     /**
@@ -281,10 +84,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *         does not permit null keys
      * (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      */
-    @Pure
-    @Ensures({"returns_iff_key_exists",
-
-            "raises_if_null_unsupported_and_null_item"})
     boolean containsKey(Object key);
 
     /**
@@ -305,9 +104,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *         map does not permit null values
      * (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      */
-    @Pure
-    @Ensures({"returns_iff_value_exists",
-            "raises_if_null_unsupported_and_null_item"})
     boolean containsValue(Object value);
 
     /**
@@ -336,10 +132,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *         does not permit null keys
      * (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      */
-    @Pure
-    @Ensures({"value_if_contains_key_else_null",
-
-            "raises_if_null_unsupported_and_null_item"})
     V get(Object key);
 
     // Modification Operations
@@ -368,11 +160,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      * @throws IllegalArgumentException if some property of the specified key
      *         or value prevents it from being stored in this map
      */
-    @Ensures({"old_value_if_contained_key_else_null",
-            "contains_entry",
-            "size_increases_iff_key_not_contained",
-
-            "raises_if_null_unsupported_and_null_item"})
     V put(K key, V value);
 
 
@@ -406,11 +193,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *         map does not permit null keys
      * (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      */
-    @Ensures({"not_contains_key",
-            "value_if_contains_key_else_null",
-            "size_decreases_iff_key_contained",
-
-            "raises_if_null_unsupported_and_null_item"})
     V remove(Object key);
 
 
@@ -435,8 +217,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      * @throws IllegalArgumentException if some property of a key or value in
      *         the specified map prevents it from being stored in this map
      */
-    @Ensures({"contains_all_entries",
-            "size_increased_for_each_key_not_contained"})
     void putAll(Map<? extends K, ? extends V> m);
 
     /**
@@ -446,7 +226,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      * @throws UnsupportedOperationException if the {@code clear} operation
      *         is not supported by this map
      */
-    @Ensures({"is_empty"})
     void clear();
 
 
@@ -467,7 +246,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *
      * @return a set view of the keys contained in this map
      */
-    @Ensures({"returns_all_keys"})
     Set<K> keySet();
 
     /**
@@ -485,7 +263,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *
      * @return a collection view of the values contained in this map
      */
-    @Ensures("returns_all_values")
     Collection<V> values();
 
     /**
@@ -504,7 +281,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *
      * @return a set view of the mappings contained in this map
      */
-    @Ensures({"returns_all_entries"})
     Set<Map.Entry<K, V>> entrySet();
 
     /**
@@ -520,7 +296,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      * @see Map#entrySet()
      * @since 1.2
      */
-    interface Entry<K, V> {
+    interface Entry<K, V> extends Contract {
 
         // ==========================================================================================
         // ==============================                              ==============================
@@ -528,12 +304,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
         // ==============================                              ==============================
         // ==========================================================================================
 
-        @Invariant
-        @Pure
-        default boolean hashcode_is_valid(int returns) {
-            return hashCode() == ((getKey() == null ? 0 : getKey().hashCode())
-                    ^ (getValue() == null ? 0 : getValue().hashCode()));
-        }
 
 
         // ==========================================================================================
@@ -542,38 +312,7 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
         // ==============================                              ==============================
         // ==========================================================================================
 
-        @Pure
-        default boolean has_value(V value) {
-            return getValue() == value;
-        }
 
-        @Pure
-        default boolean returns_old_value(V returns) {
-            return returns == old(this).getValue();
-        }
-
-        @Pure
-        default boolean returns_same_hashcode(boolean returns, Object o) {
-            return iff(returns, this.hashCode() == o.hashCode());
-        }
-
-        @Pure
-        default boolean returns_pairwise_equals(boolean returns, Object o) {
-            if (o instanceof Entry) {
-                Entry<?, ?> genOther = (Entry<?, ?>) o;
-
-                if (this.getKey().getClass().isAssignableFrom(genOther.getKey().getClass())
-                        && this.getValue().getClass().isAssignableFrom(genOther.getValue().getClass())) {
-                    Entry<K, V> other = (Entry<K, V>) o;
-
-                    return returns == (other.getKey() == null ? this.getKey() == null : other.getKey() == this.getKey()) &&
-                            (other.getValue() == null ? this.getValue() == null : other.getValue() == this.getValue());
-                }
-
-            }
-
-            return !returns;
-        }
 
         // ==========================================================================================
         // ==========================================================================================
@@ -588,7 +327,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
          *         required to, throw this exception if the entry has been
          *         removed from the backing map.
          */
-        @Pure
         K getKey();
 
         /**
@@ -601,7 +339,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
          *         required to, throw this exception if the entry has been
          *         removed from the backing map.
          */
-        @Pure
         V getValue();
 
         /**
@@ -624,7 +361,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
          *         required to, throw this exception if the entry has been
          *         removed from the backing map.
          */
-        @Ensures({"has_value", "returns_old_value"})
         V setValue(V value);
 
         /**
@@ -645,9 +381,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
          * @return {@code true} if the specified object is equal to this map
          *         entry
          */
-        @Pure
-        @Ensures({"returns_pairwise_equals",
-                "returns_same_hashcode"})
         boolean equals(Object o);
 
         /**
@@ -666,7 +399,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
          * @see Object#equals(Object)
          * @see #equals(Object)
          */
-        @Pure
         int hashCode();
 
         /**
@@ -756,9 +488,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      * @param o object to be compared for equality with this map
      * @return {@code true} if the specified object is equal to this map
      */
-    @Pure
-    @Ensures({"returns_pairwise_equals",
-            "returns_same_hashcode"})
     boolean equals(Object o);
 
     /**
@@ -774,7 +503,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      * @see Object#equals(Object)
      * @see #equals(Object)
      */
-    @Pure
     int hashCode();
 
     // Defaultable methods
@@ -801,10 +529,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      * (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      * @since 1.8
      */
-    @Pure
-    @Ensures({"value_if_contains_key_else_default",
-
-            "raises_if_null_unsupported_and_null_item"})
     default V getOrDefault(Object key, V defaultValue) {
         V v;
         return (((v = get(key)) != null) || containsKey(key))
@@ -892,9 +616,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      * removed during iteration
      * @since 1.8
      */
-    @Ensures({"size_not_changed",
-            "keys_not_changed",
-            "values_changed_with_function"})
     default void replaceAll(BiFunction<? super K, ? super V, ? extends V> function) {
         Objects.requireNonNull(function);
         for (Map.Entry<K, V> entry : entrySet()) {
@@ -962,9 +683,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *         (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      * @since 1.8
      */
-    @Ensures({"old_value_if_contained_key_else_null",
-            "size_increases_iff_key_not_contained",
-            "value_changes_only_if_not_contained_key"})
     default V putIfAbsent(K key, V value) {
         V v = get(key);
         if (v == null) {
@@ -1008,9 +726,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *         (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      * @since 1.8
      */
-    @Ensures({"size_decreased_iff_contained_entry",
-            "value_unchanged_if_not_contained_entry",
-            "returns_iff_entry_deleted"})
     default boolean remove(Object key, Object value) {
         Object curValue = get(key);
         if (!Objects.equals(curValue, value) ||
@@ -1063,7 +778,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *         or value prevents it from being stored in this map
      * @since 1.8
      */
-    @Ensures({"size_not_changed", "keys_not_changed", "value_changes_only_if_contained_entry"})
     default boolean replace(K key, V oldValue, V newValue) {
         Object curValue = get(key);
         if (!Objects.equals(curValue, oldValue) ||
@@ -1112,7 +826,6 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
      *         or value prevents it from being stored in this map
      * @since 1.8
      */
-    @Ensures({"value_if_contains_key_else_null", "size_not_changed", "contains_entry"})
     default V replace(K key, V value) {
         V curValue;
         if (((curValue = get(key)) != null) || containsKey(key)) {

@@ -1,4 +1,4 @@
-package contract;
+package contracts;
 
 import org.junit.jupiter.api.Test;
 
@@ -206,8 +206,8 @@ class MapContractsTest {
         map.putIfAbsent("one", 1);
         assertNull(map.putIfAbsent("two", 2));
         map.putIfAbsent("three", 3);
-        assertEquals(map.putIfAbsent("three", 4), 3);
-        assertEquals(map.get("three"), 3);
+        assertEquals(map.putIfAbsent("three", 4), (Integer) 3);
+        assertEquals(map.get("three"), (Integer) 3);
     }
 
     @Test
@@ -229,10 +229,10 @@ class MapContractsTest {
         map.put("two", 2);
         map.put("three", 3);
         map.put("three", 4);
-        assertEquals(map.get("three"), 4);
-        assertEquals(map.replace("three", 3), 4);
-        assertEquals(map.get("three"), 3);
-        assertNull(map.replace("four", 4));
+        assertEquals(map.get("three"), (Integer) 4);
+        assertEquals(map.replace("three", 3), (Integer) 4);
+        assertEquals(map.get("three"), (Integer) 3);
+        assertNull(map.replace("four", (Integer) 4));
     }
 
     @Test
@@ -243,8 +243,9 @@ class MapContractsTest {
         map.put("three", 3);
         map.put("three", 4);
         assertFalse(map.replace("one", 2, 1));
-        assertEquals(map.get("three"), 4);
+        assertEquals(map.get("three"), (Integer) 4);
+        assertEquals(map.get("three"), (Integer) 4);
         assertTrue(map.replace("three", 4, 3));
-        assertEquals(map.get("three"), 3);
+        assertEquals(map.get("three"), (Integer) 3);
     }
 }
