@@ -1,4 +1,4 @@
-package contract;
+package contracts;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,7 +24,6 @@ public class HashMapContracts<K, V> extends HashMap<K, V> implements MapContract
     // ==========================================================================================
     // ==========================================================================================
     // ==========================================================================================
-
 
     @Override
     public int size() {
