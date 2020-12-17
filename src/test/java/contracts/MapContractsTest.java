@@ -31,7 +31,7 @@ class MapContractsTest {
 
     @Test
     void containsKey() {
-        MapContracts<String, Integer> map = new HashMapContracts<>();
+        MapContracts<String, Integer> map= new HashMapContracts<>();
         assertFalse(map.containsKey("something"));
         map.put("something", 123);
         map.put("one", 1);
