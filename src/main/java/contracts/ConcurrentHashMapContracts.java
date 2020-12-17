@@ -2,10 +2,7 @@ package contracts;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.*;
 
@@ -28,11 +25,11 @@ public class ConcurrentHashMapContracts<K, V> extends ConcurrentHashMap<K, V> im
     // ==============================                              ==============================
     // ==========================================================================================
 
-//    @Invariant
-//    @Pure
-//    public boolean none_null() {
-//        return entrySet().stream().allMatch(entry -> entry.getKey() != null && entry.getValue() != null);
-//    }
+    @Invariant
+    @Pure
+    public boolean none_null() {
+        return keySet().stream().noneMatch(Objects::isNull) && values().stream().noneMatch(Objects::isNull);
+    }
 
     // ==========================================================================================
     // ==========================================================================================

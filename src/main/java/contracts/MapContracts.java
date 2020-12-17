@@ -30,18 +30,18 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
     // ==============================                              ==============================
     // ==========================================================================================
 
-//    @Invariant
-//    @Pure
-//    default boolean size_non_negative() {
-//        return size() >= 0;
-//    }
+    @Invariant
+    @Pure
+    default boolean size_non_negative() {
+        return size() >= 0;
+    }
 
-//    @Invariant
-//    @Pure
-//    default boolean hashcode_is_valid() {
-//        return hashCode() == entrySet().stream().map(Map.Entry::hashCode)
-//                .reduce(0, Integer::sum);
-//    }
+    @Invariant
+    @Pure
+    default boolean hashcode_is_valid() {
+        return hashCode() == entrySet().stream().map(Map.Entry::hashCode)
+                .reduce(0, Integer::sum);
+    }
 
 
     // ==========================================================================================
@@ -561,12 +561,12 @@ public interface MapContracts<K, V> extends Map<K, V>, Contract {
         // ==============================                              ==============================
         // ==========================================================================================
 
-//        @Invariant
-//        @Pure
-//        default boolean hashcode_is_valid() {
-//            return hashCode() == ((getKey() == null ? 0 : getKey().hashCode())
-//                    ^ (getValue() == null ? 0 : getValue().hashCode()));
-//        }
+        @Invariant
+        @Pure
+        default boolean hashcode_is_valid() {
+            return hashCode() == ((getKey() == null ? 0 : getKey().hashCode())
+                    ^ (getValue() == null ? 0 : getValue().hashCode()));
+        }
 
 
         // ==========================================================================================
